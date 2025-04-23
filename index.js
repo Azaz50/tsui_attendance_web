@@ -1,0 +1,22 @@
+    const express = require('express');
+    require("dotenv").config();
+    const bodyParser = require('body-parser');
+    const router = require('./routes/user.routes');
+    const cors = require('cors');
+
+
+    const app = express();
+    app.use(express.json());
+    app.use(express.urlencoded({ extended: true }));
+    const fileUpload = require("express-fileupload");
+    app.use(fileUpload());
+    app.use(cors());
+    app.use('/api',router);
+
+    const PORT = process.env.PORT;
+
+
+    // Start server
+    app.listen(PORT, () => {
+        console.log(`Server started successfully on Port ${PORT}`);
+    });
