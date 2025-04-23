@@ -4,6 +4,7 @@ const Shop = require('../models/shopModel');
 
 exports.createShop = async (req, res) => {
   const { shop_name, shop_address, shop_owner_name, shop_phone_number, shop_location, user_id } = req.body;
+  console.log(req.body);
 
   try {
     // Handle shop photo if provided

@@ -10,6 +10,7 @@ const createShop = async (shop) => {
     return result;
   } catch (error) {
     throw error;
+    console.log(error);
   }
 };
 
