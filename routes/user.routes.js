@@ -5,14 +5,20 @@ const { createShop } = require('../controllers/shopController');
 const { saleCreate } = require('../controllers/saleController');
 const { createScheme } = require('../controllers/schemeController');
 const { visitCreate } = require('../controllers/visitController');
-const { handleAttendanceAndLocation } = require('../controllers/attendanceLocationController');
+const { 
+    startAttendance, 
+    stopAttendance, 
+    updateLocation 
+} = require('../controllers/attendanceLocationController');
 
 router.post('/users/register', registerUser);
 router.post('/shop/create', createShop);
 router.post('/sales/create', saleCreate);
 router.post('/schemes/create', createScheme);
 router.post('/visits/create', visitCreate);
-router.post('/attendance-location', handleAttendanceAndLocation);
+router.post('/start-attendance', startAttendance);
+router.post('/stop-attendance', stopAttendance);
+router.post('/update-location', updateLocation);
 
 
 module.exports = router;
