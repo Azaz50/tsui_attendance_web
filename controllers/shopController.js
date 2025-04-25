@@ -7,18 +7,10 @@ exports.createShop = async (req, res) => {
   console.log(req.body);
 
   try {
-    // Handle shop photo if provided
-    let shopPhoto = req.files?.shop_photo;
-    let shop_photo = shopPhoto ? `shop_${Date.now()}${path.extname(shopPhoto.name)}` : null;
-
-    if (shopPhoto) {
-      await shopPhoto.mv(path.join(__dirname, "../uploads", shop_photo));
-    }
 
     const shop = {
       shop_name,
       shop_address,
-      shop_photo,
       shop_owner_name,
       shop_phone_number,
       shop_location,
@@ -40,3 +32,31 @@ exports.createShop = async (req, res) => {
     });
   }
 };
+
+exports.getShop = async (req, res) => {
+  const { shop_name } = req.query;
+
+  // Access user_id from the decoded token
+  const user_id = req.user?.user_id;
+
+  // Check if user_id is available
+  if (!user_id) {
+    return res.status(401).json({ message: 'User ID not found in token' });
+  }
+
+  try {
+    const shops = await Shop.getShop(user_id, shop_name);
+    res.status(200).json({
+      message: 'Shop list fetched successfully',
+      data: shops
+    });
+  } catch (error) {
+    console.error('Error in getShop controller:', error);
+    res.status(500).json({
+      message: 'Failed to fetch shop list',
+      error: error.message
+    });
+  }
+};
+
+

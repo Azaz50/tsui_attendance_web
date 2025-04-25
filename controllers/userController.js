@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require("path");
+const jwt = require('jsonwebtoken');
 
 // Register
 exports.registerUser = async (req, res) => {
@@ -34,5 +35,38 @@ exports.registerUser = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Failed to register user', error: err.message });
+  }
+};
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findUserByEmail(email);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
+    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+
+    // Send token and user info back
+    res.status(200).json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user.user_id,
+        name: user.user_name,
+        email: user.email,
+        phone_number: user.phone_number,
+        address: user.address,
+        status: user.status,
+        user_type: user.user_type
+      }
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
