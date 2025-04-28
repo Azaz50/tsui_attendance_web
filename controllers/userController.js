@@ -7,8 +7,8 @@ const jwt = require('jsonwebtoken');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { user_name, email, password, phone_number, address, status, employee_type } = req.body;
-  let { created_at } = req.body;
+  const { name, email, password, phone_number, address, status, employee_type } = req.body;
+  let { created_at, updated_at } = req.body;
 
   try {
     const existingUser = await User.findUserByEmail(email);
@@ -29,13 +29,18 @@ exports.registerUser = async (req, res) => {
       created_at = now.toISOString().slice(0, 19).replace('T', ' '); 
     }
 
-    const user = { user_name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at };
+    if (!updated_at) {
+      const now = new Date();
+      updated_at = now.toISOString().slice(0, 19).replace('T', ' '); 
+    }
+
+    const user = { name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at, updated_at };
     const result = await User.createUser(user);
 
-    res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
+    res.status(201).json({ message: 'Employee registered successfully', userId: result.insertId });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: 'Failed to register user', error: err.message });
+    res.status(500).json({ message: 'Failed to register employee', error: err.message });
   }
 };
 
@@ -54,14 +59,13 @@ exports.loginUser = async (req, res) => {
     
     const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-
     // Send token and user info back
     res.status(200).json({
       message: 'Login successful',
       token,
       employee: {
         id: employee.user_id,
-        name: employee.user_name,
+        name: employee.name,
         email: employee.email,
         phone_number: employee.phone_number,
         address: employee.address,

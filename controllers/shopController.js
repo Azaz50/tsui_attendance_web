@@ -3,8 +3,7 @@ const multer = require('multer');
 const Shop = require('../models/shopModel');
 
 exports.createShop = async (req, res) => {
-  const { shop_name, shop_address, shop_owner_name, shop_phone_number, shop_location, user_id } = req.body;
-  console.log(req.body);
+  const { shop_name, shop_address, shop_owner_name, shop_phone_number, shop_location, user_id, created_at, updated_at } = req.body;
 
   try {
 
@@ -15,6 +14,8 @@ exports.createShop = async (req, res) => {
       shop_phone_number,
       shop_location,
       user_id,
+      created_at: new Date(),
+      updated_at: new Date()
     };
 
     const result = await Shop.createShop(shop);

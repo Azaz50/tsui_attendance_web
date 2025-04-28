@@ -20,7 +20,6 @@ exports.createScheme = async (req, res) => {
       scheme_description,
       scheme_photo,
     };
-console.log(shop);
     const result = await Shop.createScheme(shop);
 
     res.status(201).json({

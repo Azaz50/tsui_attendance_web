@@ -2,8 +2,8 @@ const db = require('../config/db.config');
 
 // Function to create a new user
 const createUser = async (user) => {
-  const sql = `INSERT INTO users ( user_name, email, password, phone_number, address, userPhoto, status, employee_type, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  const values = [user.user_name, user.email, user.password, user.phone_number, user.address, user.userPhotoName, user.status, user.employee_type, user.created_at];
+  const sql = `INSERT INTO users ( name, email, password, phone_number, address, userPhoto, status, employee_type, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+  const values = [user.name, user.email, user.password, user.phone_number, user.address, user.userPhotoName, user.status, user.employee_type, user.created_at, user.updated_at];
   
   try {
     const [result] = await db.query(sql, values);

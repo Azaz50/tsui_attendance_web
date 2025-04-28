@@ -4,6 +4,8 @@ exports.visitCreate = async (req, res) => {
   const {
     shop_id,
     user_id,
+    created_at,
+    updated_at,
     visit_date_time
   } = req.body;
 
@@ -11,7 +13,9 @@ exports.visitCreate = async (req, res) => {
     const visit = {
       shop_id,
       user_id,
-      visit_date_time: new Date(),
+      created_at: new Date(),
+      updated_at: new Date(),
+      visit_date_time: null
     };
 
     const result = await Visit.createVisit(visit);
