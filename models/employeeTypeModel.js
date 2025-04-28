@@ -1,13 +1,12 @@
-const db = require('../config/db.config');  // Assuming db is the MySQL connection
+const db = require('../config/db.config');
 
-// Function to create a new EmployeeType
 const createEmployeeType = async (employeeType) => {
   const sql = `
-    INSERT INTO employee_types (employee_type, user_id)
-    VALUES (?, ?)
+    INSERT INTO employee_types (employee_type)
+    VALUES (?)
   `;
 
-  const values = [employeeType.employee_type, employeeType.user_id];
+  const values = [employeeType.employee_type];
 
   try {
     const [result] = await db.query(sql, values);
@@ -17,6 +16,29 @@ const createEmployeeType = async (employeeType) => {
   }
 };
 
+const getEmployeeTypeById = async (employeeTypeId) => {
+  const sql = `
+    SELECT employee_type
+    FROM employee_types
+    WHERE id = ?
+  `;
+
+  const values = [employeeTypeId];
+
+  try {
+    const [rows] = await db.query(sql, values);
+    if (rows.length > 0) {
+      return rows[0].employee_type;
+    } else {
+      throw new Error('Employee type not found');
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   createEmployeeType,
+  getEmployeeTypeById
 };
+

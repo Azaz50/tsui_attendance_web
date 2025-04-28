@@ -1,4 +1,5 @@
 const User = require('../models/userModel');
+const Employee = require('../models/employeeTypeModel');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require("path");
@@ -47,6 +48,10 @@ exports.loginUser = async (req, res) => {
 
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
+
+    // Fetch the employee type name from the employee_types table
+    const employeeType = await Employee.getEmployeeTypeById(employee.employee_type);
+    
     const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
@@ -61,7 +66,7 @@ exports.loginUser = async (req, res) => {
         phone_number: employee.phone_number,
         address: employee.address,
         status: employee.status,
-        employee_type: employee.employee_type
+        employee_type: employeeType
       }
     });
 
