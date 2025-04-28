@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { user_name, email, password, phone_number, address, status, user_type } = req.body;
+  const { user_name, email, password, phone_number, address, status, employee_type } = req.body;
   let { created_at } = req.body;
 
   try {
@@ -28,7 +28,7 @@ exports.registerUser = async (req, res) => {
       created_at = now.toISOString().slice(0, 19).replace('T', ' '); 
     }
 
-    const user = { user_name, email, password: hashedPassword, address, phone_number, userPhotoName, status, user_type, created_at };
+    const user = { user_name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at };
     const result = await User.createUser(user);
 
     res.status(201).json({ message: 'User registered successfully', userId: result.insertId });
@@ -42,26 +42,26 @@ exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findUserByEmail(email);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const employee = await User.findUserByEmail(email);
+    if (!employee) return res.status(404).json({ message: 'User not found' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
-    const token = jwt.sign({ user_id: user.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
     // Send token and user info back
     res.status(200).json({
       message: 'Login successful',
       token,
-      user: {
-        id: user.user_id,
-        name: user.user_name,
-        email: user.email,
-        phone_number: user.phone_number,
-        address: user.address,
-        status: user.status,
-        user_type: user.user_type
+      employee: {
+        id: employee.user_id,
+        name: employee.user_name,
+        email: employee.email,
+        phone_number: employee.phone_number,
+        address: employee.address,
+        status: employee.status,
+        employee_type: employee.employee_type
       }
     });
 
