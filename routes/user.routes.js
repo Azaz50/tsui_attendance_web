@@ -6,6 +6,7 @@ const { saleCreate, getSale } = require('../controllers/saleController');
 const { createScheme } = require('../controllers/schemeController');
 const { visitCreate } = require('../controllers/visitController');
 const { createEmployeeType  } = require('../controllers/employeeTypeController');
+const { createHoliday, getHolidays, deleteHoliday  } = require('../controllers/holidayController');
 const { 
     startAttendance, 
     stopAttendance, 
@@ -26,7 +27,9 @@ router.post('/start-attendance', startAttendance);
 router.post('/stop-attendance', stopAttendance);
 router.post('/update-location', updateLocation);
 router.post('/employees/create', createEmployeeType); 
-
+router.post('/holidays/add', createHoliday);
+router.get('/holidays/list', getHolidays);
+router.delete('/holidays/delete/:id', deleteHoliday);
 
 
 module.exports = router;
