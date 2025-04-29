@@ -19,7 +19,7 @@ exports.registerUser = async (req, res) => {
 
     if (userPhoto) {
       await userPhoto.mv(path.join(__dirname, "../uploads", userPhotoName));
-  }
+    }
 
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
