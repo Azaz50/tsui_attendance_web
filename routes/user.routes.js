@@ -15,7 +15,7 @@ const authenticateToken = require('../middlewares/authMiddleware');
 
 router.post('/employees/add', registerUser);
 router.post('/employees/login', loginUser); 
-router.post('/employees/list', getUserList); 
+router.get('/employees/list', getUserList); 
 router.post('/shop/add', createShop);
 router.get('/shops', authenticateToken, getShop); 
 router.post('/sales/add', saleCreate);

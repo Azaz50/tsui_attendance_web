@@ -59,7 +59,8 @@ exports.loginUser = async (req, res) => {
     
     const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-    // Send token and user info back
+    const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
+
     res.status(200).json({
       message: 'Login successful',
       token,
@@ -70,7 +71,8 @@ exports.loginUser = async (req, res) => {
         phone_number: employee.phone_number,
         address: employee.address,
         status: employee.status,
-        employee_type: employeeType
+        employee_type: employeeType,
+        userPhoto: employee.userPhotoName ? baseUrl + employee.userPhotoName : null
       }
     });
 
@@ -82,10 +84,21 @@ exports.loginUser = async (req, res) => {
 
 exports.getUserList = async (req, res) => {
   try {
-    const users = await User.getUserList(); // calling from userModel
+    const users = await User.getUserList();
+
+    // Construct full photo path
+    const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
+
+    const updatedUsers = users.map(user => {
+      return {
+        ...user,
+        userPhoto: user.userPhoto ? baseUrl + user.userPhoto : null
+      };
+    });
+
     res.status(200).json({
       message: 'User list fetched successfully',
-      users
+      users: updatedUsers
     });
   } catch (error) {
     console.error('Error fetching user list:', error);
@@ -95,3 +108,4 @@ exports.getUserList = async (req, res) => {
     });
   }
 };
+
