@@ -2,8 +2,9 @@ const Attendance = require('../models/attendanceModel');
 const Location = require('../models/locationModel');
 
 const startAttendance = async (req, res) => {
-  const { user_id, attend_date, attend_start_time, attend_status = 1, cordinate, recorded_at } = req.body;
-  if (!user_id || !attend_date || !attend_start_time || !cordinate || !recorded_at) {
+  const { user_id, attend_date, attend_start_time, attend_status = 1, cordinate, recorded_at, created_at, updated_at } = req.body;
+
+  if (!user_id || !attend_date || !attend_start_time || !cordinate) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -13,7 +14,10 @@ const startAttendance = async (req, res) => {
       attend_date,
       attend_start_time,
       attend_end_time: null,
-      attend_status
+      recorded_at: null,
+      attend_status,
+      created_at: new Date(),
+      updated_at: new Date()
     }
     const attendanceResult = await Attendance.createAttendance(result);
 
@@ -23,7 +27,9 @@ const startAttendance = async (req, res) => {
       attend_id,
       user_id,
       cordinate,
-      recorded_at
+      recorded_at,
+      created_at: new Date(),
+      updated_at: new Date()
     });
 
     res.status(201).json({ message: 'Attendance started and location saved', attend_id });
@@ -33,13 +39,13 @@ const startAttendance = async (req, res) => {
 };
 
 const stopAttendance = async (req, res) => {
-  const { attend_id, user_id, attend_end_time, cordinate, recorded_at } = req.body;
+  const { attend_id, user_id, attend_end_time, cordinate, recorded_at, created_at, updated_at } = req.body;
   if (!attend_id || !user_id || !attend_end_time || !cordinate || !recorded_at) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
   try {
-    await Attendance.updateEndTime({ attend_id, attend_end_time });
+    await Attendance.updateEndTime({ attend_id, attend_end_time, created_at, updated_at });
 
     await Location.updateLocation({
       attend_id,
@@ -55,7 +61,7 @@ const stopAttendance = async (req, res) => {
 };
 
 const updateLocation = async (req, res) => {
-  const { attend_id, user_id, cordinate } = req.body;
+  const { attend_id, user_id, cordinate, created_at, updated_at } = req.body;
   if (!attend_id || !cordinate) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
@@ -64,6 +70,8 @@ const updateLocation = async (req, res) => {
     await Location.updateLocation({
       attend_id,
       cordinate,
+      created_at: new Date(),
+      updated_at: new Date()
     });
 
     res.status(200).json({ message: 'Location updated successfully' });

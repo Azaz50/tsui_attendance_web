@@ -1,14 +1,18 @@
 const EmployeeType = require('../models/employeeTypeModel');
 
 exports.createEmployeeType = async (req, res) => {
-  const { employee_type } = req.body;
+  const { employee_type, created_at, updated_at } = req.body;
 
   if (!employee_type) {
     return res.status(400).json({ message: 'Employee type is required' });
   }
 
   try {
-    const newEmployeeType = { employee_type };
+    const newEmployeeType = { 
+      employee_type,
+      created_at: new Date(),
+      updated_at: new Date()
+    };
     const result = await EmployeeType.createEmployeeType(newEmployeeType);
 
     res.status(201).json({

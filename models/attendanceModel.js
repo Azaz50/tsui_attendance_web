@@ -1,10 +1,10 @@
 const db = require('../config/db.config');
 
-const createAttendance = async ({ user_id, attend_date, attend_start_time, attend_status }) => {
+const createAttendance = async ({ user_id, attend_date, attend_start_time, attend_status, created_at, updated_at }) => {
   const [result] = await db.query(`
-    INSERT INTO attendances (user_id, attend_date, attend_start_time, attend_status)
-    VALUES (?, ?, ?, ?)`,
-    [user_id, attend_date, attend_start_time, attend_status]
+    INSERT INTO attendances (user_id, attend_date, attend_start_time, attend_status, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?)`,
+    [user_id, attend_date, attend_start_time, attend_status, created_at, updated_at]
   );
   return result;
 };

@@ -79,3 +79,19 @@ exports.loginUser = async (req, res) => {
     res.status(500).json({ message: 'Login failed', error: error.message });
   }
 };
+
+exports.getUserList = async (req, res) => {
+  try {
+    const users = await User.getUserList(); // calling from userModel
+    res.status(200).json({
+      message: 'User list fetched successfully',
+      users
+    });
+  } catch (error) {
+    console.error('Error fetching user list:', error);
+    res.status(500).json({
+      message: 'Failed to fetch user list',
+      error: error.message
+    });
+  }
+};

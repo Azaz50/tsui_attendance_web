@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerUser, loginUser } = require('../controllers/userController');
+const { registerUser, loginUser, getUserList } = require('../controllers/userController');
 const { createShop, getShop } = require('../controllers/shopController');
 const { saleCreate, getSale } = require('../controllers/saleController');
 const { createScheme } = require('../controllers/schemeController');
@@ -15,6 +15,7 @@ const authenticateToken = require('../middlewares/authMiddleware');
 
 router.post('/employees/add', registerUser);
 router.post('/employees/login', loginUser); 
+router.post('/employees/list', getUserList); 
 router.post('/shop/add', createShop);
 router.get('/shops', authenticateToken, getShop); 
 router.post('/sales/add', saleCreate);

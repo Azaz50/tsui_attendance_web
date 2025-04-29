@@ -1,6 +1,6 @@
 const Sale = require('../models/saleModel');
+const Visit = require('../models/visitModel');
 
-// Create Sale (Already done by you)
 exports.saleCreate = async (req, res) => {
   const {
     shop_id,
@@ -8,36 +8,51 @@ exports.saleCreate = async (req, res) => {
     number_purches_item,
     selling_rate,
     total_amount,
-    locker_type,
+    locker_type
   } = req.body;
 
+  const timestamp = new Date();
+
   try {
+    // Create Sale
     const sale = {
       shop_id,
       user_id,
-      start_date: new Date(),
-      end_date: new Date(),
+      start_date: null,
+      end_date: null,
       number_purches_item,
       selling_rate,
       total_amount,
       locker_type,
+      created_at: timestamp,
+      updated_at: timestamp
     };
 
-    const result = await Sale.createSale(sale);
+    const saleResult = await Sale.createSale(sale);
+
+    // Create Visit linked to Sale
+    const visit = {
+      shop_id,
+      user_id,
+      visit_date_time: null,
+    };
+
+    await Visit.createVisit(visit);
 
     res.status(201).json({
-      message: 'Sale created successfully',
-      saleId: result.insertId,
+      message: 'Sale and Visit created successfully',
+      saleId: saleResult.insertId,
     });
 
   } catch (error) {
-    console.error('Error creating sale:', error);
+    console.error('Error creating sale or visit:', error);
     res.status(500).json({
-      message: 'Failed to create sale',
+      message: 'Failed to create sale or visit',
       error: error.message,
     });
   }
 };
+
 
 // New: Get Sales
 exports.getSale = async (req, res) => {

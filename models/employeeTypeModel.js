@@ -2,11 +2,11 @@ const db = require('../config/db.config');
 
 const createEmployeeType = async (employeeType) => {
   const sql = `
-    INSERT INTO employee_types (employee_type)
-    VALUES (?)
+    INSERT INTO employee_types (employee_type, created_at, updated_at)
+    VALUES (?, ?, ?)
   `;
 
-  const values = [employeeType.employee_type];
+  const values = [employeeType.employee_type, employeeType.created_at, employeeType.updated_at];
 
   try {
     const [result] = await db.query(sql, values);

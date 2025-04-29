@@ -3,7 +3,7 @@ const multer = require('multer');
 const Shop = require('../models/schemeModel');
 
 exports.createScheme = async (req, res) => {
-  const { scheme_title, scheme_description } = req.body;
+  const { scheme_title, scheme_description, created_at, updated_at } = req.body;
 
   try {
     // Handle shop photo if provided
@@ -19,11 +19,13 @@ exports.createScheme = async (req, res) => {
       scheme_title,
       scheme_description,
       scheme_photo,
+      created_at: new Date(),
+      updated_at: new Date()
     };
     const result = await Shop.createScheme(shop);
 
     res.status(201).json({
-      message: 'Shop created successfully',
+      message: 'scheme created successfully',
       shopId: result.insertId
     });
 
