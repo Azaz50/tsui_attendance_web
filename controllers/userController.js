@@ -7,8 +7,11 @@ const jwt = require('jsonwebtoken');
 
 // Register
 exports.registerUser = async (req, res) => {
-  const { name, email, password, phone_number, address, status, employee_type } = req.body;
-  let { created_at, updated_at } = req.body;
+  const { 
+    name, email, password, phone_number, address, status, employee_type, emp_id, emp_name, designation,
+    department, uan, pf_number, esi_number, bank, acc_number, ifsc
+   } = req.body;
+  let { created_at, updated_at, date_of_joining } = req.body;
 
   try {
     const existingUser = await User.findUserByEmail(email);
@@ -34,7 +37,10 @@ exports.registerUser = async (req, res) => {
       updated_at = now.toISOString().slice(0, 19).replace('T', ' '); 
     }
 
-    const user = { name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at, updated_at };
+    const user = { 
+      name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at, updated_at,
+      emp_id, emp_name, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc
+    };
     const result = await User.createUser(user);
 
     res.status(201).json({ message: 'Employee registered successfully', userId: result.insertId });
@@ -72,7 +78,18 @@ exports.loginUser = async (req, res) => {
         address: employee.address,
         status: employee.status,
         employee_type: employeeType,
-        userPhoto: employee.userPhotoName ? baseUrl + employee.userPhotoName : null
+        userPhoto: employee.userPhotoName ? baseUrl + employee.userPhotoName : null,
+        emp_id: employee.emp_id,
+        emp_name: employee.emp_name,
+        designation: employee.designation,
+        department: employee.department,
+        date_of_joining: employee.date_of_joining,
+        uan: employee.uan,
+        pf_number: employee.pf_number,
+        esi_number: employee.esi_number,
+        bank: employee.bank,
+        acc_number: employee.acc_number,
+        ifsc: employee.ifsc
       }
     });
 

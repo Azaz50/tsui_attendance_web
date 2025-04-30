@@ -12,6 +12,10 @@ const {
     stopAttendance, 
     updateLocation 
 } = require('../controllers/attendanceLocationController');
+
+const { createSalary, updateSalary, listSalaries  } = require('../controllers/salaryController');
+
+
 const authenticateToken = require('../middlewares/authMiddleware');
 
 router.post('/employees/add', registerUser);
@@ -30,6 +34,14 @@ router.post('/employees/create', createEmployeeType);
 router.post('/holidays/add', createHoliday);
 router.get('/holidays/list', getHolidays);
 router.delete('/holidays/delete/:id', deleteHoliday);
+router.post('/salary/add', createShop);
+
+
+
+router.post('/salaries/add', createSalary);
+router.put('/salaries/update/:salary_id', updateSalary);
+router.get('/salaries/list/slip', listSalaries);
+
 
 
 module.exports = router;
