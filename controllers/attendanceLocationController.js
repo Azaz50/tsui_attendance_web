@@ -4,7 +4,7 @@ const Location = require('../models/locationModel');
 const startAttendance = async (req, res) => {
   const { user_id, attend_date, attend_start_time, attend_status = 1, cordinate, recorded_at, created_at, updated_at } = req.body;
 
-  if (!user_id || !attend_date || !attend_start_time || !cordinate) {
+  if (!user_id || !Array.isArray(cordinate)) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -40,7 +40,7 @@ const startAttendance = async (req, res) => {
 
 const stopAttendance = async (req, res) => {
   const { attend_id, user_id, attend_end_time, cordinate, recorded_at, created_at, updated_at } = req.body;
-  if (!attend_id || !user_id || !attend_end_time || !cordinate || !recorded_at) {
+  if (!attend_id || !Array.isArray(cordinate)) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -62,8 +62,9 @@ const stopAttendance = async (req, res) => {
 
 const updateLocation = async (req, res) => {
   const { attend_id, user_id, cordinate, created_at, updated_at } = req.body;
-  if (!attend_id || !cordinate) {
-    return res.status(400).json({ message: 'Missing required fields' });
+
+  if (!attend_id || !cordinate || !Array.isArray(cordinate)) {
+    return res.status(400).json({ message: 'Missing or invalid required fields' });
   }
 
   try {
