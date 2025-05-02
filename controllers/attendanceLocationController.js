@@ -9,7 +9,7 @@ const startAttendance = async (req, res) => {
   }
 
   try {
-    const result = { 
+    const result = {
       user_id,
       attend_date,
       attend_start_time,

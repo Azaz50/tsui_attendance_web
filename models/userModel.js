@@ -2,7 +2,7 @@ const db = require('../config/db.config');
 
 // Function to create a new user
 const createUser = async (user) => {
-  const sql = `INSERT INTO users ( 
+  const sql = `INSERT INTO users (
   name, email, password, phone_number, address, userPhoto, status, employee_type, 
   created_at, updated_at, emp_id, emp_name, designation, department, date_of_joining,
   uan, pf_number, esi_number, bank, acc_number, ifsc
