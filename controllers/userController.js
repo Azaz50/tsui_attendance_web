@@ -8,14 +8,20 @@ const jwt = require('jsonwebtoken');
 // Register
 exports.registerUser = async (req, res) => {
   const { 
-    name, email, password, phone_number, address, status, employee_type, emp_id, emp_name, designation,
+    name, email, password, phone_number, address, status, emp_id, designation,
     department, uan, pf_number, esi_number, bank, acc_number, ifsc
-   } = req.body;
-  let { created_at, updated_at, date_of_joining } = req.body;
+  } = req.body;
+  let { created_at, updated_at, date_of_joining, employee_type } = req.body;
 
   try {
     const existingUser = await User.findUserByEmail(email);
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
+
+    // Get employee_type ID from name
+    const employeeTypeData = await Employee.getEmployeeTypeByName(employee_type);
+    if (!employeeTypeData) return res.status(400).json({ message: 'Invalid employee_type' });
+
+    const employee_type_id = employeeTypeData.id;
 
     let userPhoto = req.files?.userPhoto;
     let userPhotoName = userPhoto ? `user_${Date.now()}${path.extname(userPhoto.name)}` : null;
@@ -27,20 +33,20 @@ exports.registerUser = async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
 
+    const now = new Date();
     if (!created_at) {
-      const now = new Date();
-      created_at = now.toISOString().slice(0, 19).replace('T', ' '); 
+      created_at = now.toISOString().slice(0, 19).replace('T', ' ');
     }
-
     if (!updated_at) {
-      const now = new Date();
-      updated_at = now.toISOString().slice(0, 19).replace('T', ' '); 
+      updated_at = now.toISOString().slice(0, 19).replace('T', ' ');
     }
 
     const user = { 
-      name, email, password: hashedPassword, address, phone_number, userPhotoName, status, employee_type, created_at, updated_at,
-      emp_id, emp_name, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc
+      name, email, password: hashedPassword, address, phone_number, userPhotoName, status, 
+      employee_type: employee_type_id, created_at, updated_at,
+      emp_id, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc
     };
+
     const result = await User.createUser(user);
 
     res.status(201).json({ message: 'Employee registered successfully', userId: result.insertId });
@@ -50,12 +56,17 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
     const employee = await User.findUserByEmail(email);
     if (!employee) return res.status(404).json({ message: 'User not found' });
+
+    if (employee.status !== '1' && employee.status !== 1) {
+      return res.status(403).json({ message: 'You are not allowed to login. Inactive user.' });
+    }
 
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
@@ -80,7 +91,6 @@ exports.loginUser = async (req, res) => {
         employee_type: employeeType,
         userPhoto: employee.userPhotoName ? baseUrl + employee.userPhotoName : null,
         emp_id: employee.emp_id,
-        emp_name: employee.emp_name,
         designation: employee.designation,
         department: employee.department,
         date_of_joining: employee.date_of_joining,

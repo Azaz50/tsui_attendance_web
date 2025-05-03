@@ -37,8 +37,19 @@ const getEmployeeTypeById = async (employeeTypeId) => {
   }
 };
 
+const getEmployeeTypeByName = async (typeName) => {
+  const [rows] = await db.execute(
+    'SELECT id FROM employee_types WHERE employee_type = ?', 
+    [typeName]
+  );
+  return rows[0];
+};
+
+
+
 module.exports = {
   createEmployeeType,
-  getEmployeeTypeById
+  getEmployeeTypeById,
+  getEmployeeTypeByName
 };
 
