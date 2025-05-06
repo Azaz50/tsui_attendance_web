@@ -40,9 +40,25 @@ const getUserList = async (user_id) => {
   }
 };
 
+const updatePassword = async (userId, newHashedPassword) => {
+  let connection;
+  try {
+    connection = await db.getConnection(); // Get connection from pool or single connection
+    const sql = 'UPDATE users SET password = ? WHERE user_id = ?';
+    const [result] = await connection.query(sql, [newHashedPassword, userId]);
+    return result;
+  } catch (err) {
+    console.error('Error in updatePassword:', err);
+    throw err;
+  } finally {
+    if (connection) connection.release();
+  }
+}
+
 
 module.exports = {
   createUser,
   findUserByEmail,
-  getUserList
+  getUserList,
+  updatePassword
 };

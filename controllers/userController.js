@@ -1,23 +1,22 @@
 const User = require('../models/userModel');
 const Employee = require('../models/employeeTypeModel');
-const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require("path");
+const { encrypt, decrypt } = require('../utils/cryptoUtils');
 const jwt = require('jsonwebtoken');
 
-// Register
 exports.registerUser = async (req, res) => {
   const { 
     name, email, password, phone_number, address, status, emp_id, designation,
     department, uan, pf_number, esi_number, bank, acc_number, ifsc
   } = req.body;
+
   let { created_at, updated_at, date_of_joining, employee_type } = req.body;
 
   try {
     const existingUser = await User.findUserByEmail(email);
     if (existingUser) return res.status(400).json({ message: 'User already exists' });
 
-    // Get employee_type ID from name
     const employeeTypeData = await Employee.getEmployeeTypeByName(employee_type);
     if (!employeeTypeData) return res.status(400).json({ message: 'Invalid employee_type' });
 
@@ -30,8 +29,7 @@ exports.registerUser = async (req, res) => {
       await userPhoto.mv(path.join(__dirname, "../uploads", userPhotoName));
     }
 
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(String(password), saltRounds);
+    const encryptedPassword = encrypt(password);
 
     const now = new Date();
     if (!created_at) {
@@ -42,7 +40,7 @@ exports.registerUser = async (req, res) => {
     }
 
     const user = { 
-      name, email, password: hashedPassword, address, phone_number, userPhotoName, status, 
+      name, email, password: encryptedPassword, address, phone_number, userPhotoName, status, 
       employee_type: employee_type_id, created_at, updated_at,
       emp_id, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc
     };
@@ -56,7 +54,6 @@ exports.registerUser = async (req, res) => {
   }
 };
 
-
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -68,10 +65,11 @@ exports.loginUser = async (req, res) => {
       return res.status(403).json({ message: 'You are not allowed to login. Inactive user.' });
     }
 
-    const isMatch = await bcrypt.compare(password, employee.password);
-    if (!isMatch) return res.status(401).json({ message: 'Invalid password' });
+    const decryptedPassword = decrypt(employee.password);
+    if (decryptedPassword !== password) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
 
-    // Fetch the employee type name from the employee_types table
     const employeeType = await Employee.getEmployeeTypeById(employee.employee_type);
     
     const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
@@ -89,7 +87,7 @@ exports.loginUser = async (req, res) => {
         address: employee.address,
         status: employee.status,
         employee_type: employeeType,
-        userPhoto: employee.userPhotoName ? baseUrl + employee.userPhotoName : null,
+        userPhoto: employee.userPhoto ? baseUrl + employee.userPhoto : null,
         emp_id: employee.emp_id,
         designation: employee.designation,
         department: employee.department,
@@ -112,13 +110,21 @@ exports.loginUser = async (req, res) => {
 exports.getUserList = async (req, res) => {
   try {
     const users = await User.getUserList();
-
-    // Construct full photo path
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 
     const updatedUsers = users.map(user => {
+      let decryptedPassword = null;
+
+      try {
+        // Decrypt password if exists
+        decryptedPassword = user.password ? decrypt(user.password) : null;
+      } catch (err) {
+        console.error(`Failed to decrypt password for user ID ${user.user_id}:`, err.message);
+      }
+
       return {
         ...user,
+        password: decryptedPassword,
         userPhoto: user.userPhoto ? baseUrl + user.userPhoto : null
       };
     });
@@ -135,4 +141,3 @@ exports.getUserList = async (req, res) => {
     });
   }
 };
-

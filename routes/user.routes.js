@@ -14,12 +14,14 @@ const {
 } = require('../controllers/attendanceLocationController');
 
 const { createSalary, updateSalary, listSalaries  } = require('../controllers/salaryController');
+const { updatePassword  } = require('../controllers/updatePasswordController');
 
 
 const authenticateToken = require('../middlewares/authMiddleware');
 
 router.post('/employees/add', registerUser);
 router.post('/employees/login', loginUser); 
+router.post('/employees/update-password', updatePassword); 
 router.get('/employees/list', getUserList); 
 router.post('/shop/add', createShop);
 router.get('/shops', authenticateToken, getShop); 
