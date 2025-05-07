@@ -34,25 +34,23 @@ exports.createShop = async (req, res) => {
   }
 };
 
-exports.getShop = async (req, res) => {
-  const { shop_name } = req.query;
+exports.getAllShopsByRole = async (req, res) => {
 
-  // Access user_id from the decoded token
   const user_id = req.user?.user_id;
+  const employee_type = req.user?.employee_type;
 
-  // Check if user_id is available
-  if (!user_id) {
-    return res.status(401).json({ message: 'User ID not found in token' });
+  if (!user_id || !employee_type) {
+    return res.status(401).json({ message: 'Unauthorized. User info missing.' });
   }
 
   try {
-    const shops = await Shop.getShop(user_id, shop_name);
+    const shops = await Shop.getShopsByRole(user_id, employee_type);
     res.status(200).json({
       message: 'Shop list fetched successfully',
       data: shops
     });
   } catch (error) {
-    console.error('Error in getShop controller:', error);
+    console.error('Error fetching shop list:', error);
     res.status(500).json({
       message: 'Failed to fetch shop list',
       error: error.message

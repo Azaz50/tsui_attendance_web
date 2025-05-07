@@ -8,7 +8,9 @@ exports.saleCreate = async (req, res) => {
     number_purches_item,
     selling_rate,
     total_amount,
-    locker_type
+    locker_type,
+    date,
+    time
   } = req.body;
 
   const timestamp = new Date();
@@ -18,8 +20,8 @@ exports.saleCreate = async (req, res) => {
     const sale = {
       shop_id,
       user_id,
-      start_date: null,
-      end_date: null,
+      date,
+      time,
       number_purches_item,
       selling_rate,
       total_amount,
@@ -27,6 +29,7 @@ exports.saleCreate = async (req, res) => {
       created_at: timestamp,
       updated_at: timestamp
     };
+
 
     const saleResult = await Sale.createSale(sale);
 
@@ -54,7 +57,6 @@ exports.saleCreate = async (req, res) => {
 };
 
 
-// New: Get Sales
 exports.getSale = async (req, res) => {
   const { start_date, end_date, user_id, shop_id } = req.query;
 
@@ -65,7 +67,6 @@ exports.getSale = async (req, res) => {
       message: 'Sales fetched successfully',
       data: sales,
     });
-
   } catch (error) {
     console.error('Error fetching sales:', error);
     res.status(500).json({

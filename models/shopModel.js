@@ -14,13 +14,16 @@ const createShop = async (shop) => {
   }
 };
 
-const getShop = async (user_id, shop_name) => {
-  let sql = `SELECT * FROM shops  WHERE user_id = ?`;
-  let values = [user_id];
 
-  if (shop_name) {
-    sql += ` WHERE shop_name LIKE ?`;
-    values.push(`%${shop_name}%`);
+const getShopsByRole = async (user_id, employee_type) => {
+  let sql = `SELECT * FROM shops`;
+  let values = [];
+
+  const type = Number(employee_type);
+
+  if (type === 2 || type === 3) {
+    sql += ` WHERE user_id = ?`;
+    values.push(user_id);
   }
 
   try {
@@ -35,5 +38,5 @@ const getShop = async (user_id, shop_name) => {
 
 module.exports = {
   createShop,
-  getShop
+  getShopsByRole
 };

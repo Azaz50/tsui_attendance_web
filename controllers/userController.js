@@ -72,7 +72,10 @@ exports.loginUser = async (req, res) => {
 
     const employeeType = await Employee.getEmployeeTypeById(employee.employee_type);
     
-    const token = jwt.sign({ user_id: employee.user_id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ 
+      user_id: employee.user_id,
+      employee_type: employee.employee_type
+     }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 

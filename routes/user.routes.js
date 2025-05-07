@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { registerUser, loginUser, getUserList } = require('../controllers/userController');
-const { createShop, getShop } = require('../controllers/shopController');
+const { createShop, getAllShopsByRole } = require('../controllers/shopController');
 const { saleCreate, getSale } = require('../controllers/saleController');
 const { createScheme } = require('../controllers/schemeController');
 const { visitCreate } = require('../controllers/visitController');
@@ -24,7 +24,7 @@ router.post('/employees/login', loginUser);
 router.post('/employees/update-password', updatePassword); 
 router.get('/employees/list', getUserList); 
 router.post('/shop/add', createShop);
-router.get('/shops', authenticateToken, getShop); 
+router.get('/shops', authenticateToken, getAllShopsByRole); 
 router.post('/sales/add', saleCreate);
 router.get('/sales/list', getSale);
 router.post('/schemes/add', createScheme);
