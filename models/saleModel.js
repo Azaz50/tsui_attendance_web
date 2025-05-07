@@ -77,7 +77,6 @@ const getSales = async ({ start_date, end_date, user_id, shop_id }) => {
 
   try {
     const [rows] = await db.query(sql, values);
-    console.log('Rows Returned:', rows);
     return rows;
   } catch (error) {
     console.error('Query Error:', error);
