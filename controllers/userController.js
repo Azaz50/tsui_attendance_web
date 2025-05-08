@@ -110,16 +110,25 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+
 exports.getUserList = async (req, res) => {
   try {
-    const users = await User.getUserList();
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    // Fetch total user count
+    const totalUsers = await User.countUsers();
+
+    // Fetch paginated users
+    const users = await User.getUserList(limit, offset);
+
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 
     const updatedUsers = users.map(user => {
       let decryptedPassword = null;
 
       try {
-        // Decrypt password if exists
         decryptedPassword = user.password ? decrypt(user.password) : null;
       } catch (err) {
         console.error(`Failed to decrypt password for user ID ${user.user_id}:`, err.message);
@@ -134,7 +143,13 @@ exports.getUserList = async (req, res) => {
 
     res.status(200).json({
       message: 'User list fetched successfully',
-      users: updatedUsers
+      users: updatedUsers,
+      pagination: {
+        totalUsers,
+        currentPage: page,
+        totalPages: Math.ceil(totalUsers / limit),
+        pageSize: limit
+      }
     });
   } catch (error) {
     console.error('Error fetching user list:', error);

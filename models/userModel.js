@@ -28,18 +28,6 @@ const findUserByEmail = async (email) => {
   return rows[0];
 };
 
-const getUserList = async (user_id) => {
-  let sql = `SELECT * FROM users`;
-  let values = [user_id];
-
-  try {
-    const [rows] = await db.query(sql, values);
-    return rows;
-  } catch (error) {
-    throw error;
-  }
-};
-
 const updatePassword = async (userId, newHashedPassword) => {
   let connection;
   try {
@@ -55,10 +43,26 @@ const updatePassword = async (userId, newHashedPassword) => {
   }
 }
 
+const countUsers = async () => {
+  const [rows] = await db.query('SELECT COUNT(*) AS count FROM users');
+  return rows[0].count;
+};
+
+const getUserList = async (limit, offset) => {
+  const [rows] = await db.query(
+    'SELECT * FROM users ORDER BY user_id DESC LIMIT ? OFFSET ?',
+    [limit, offset]
+  );
+  return rows;
+};
+
+
 
 module.exports = {
   createUser,
   findUserByEmail,
   getUserList,
-  updatePassword
+  updatePassword,
+  getUserList,
+  countUsers
 };

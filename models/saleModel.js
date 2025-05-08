@@ -73,7 +73,7 @@ const getSales = async ({ start_date, end_date, user_id, shop_id }) => {
     sql += ' WHERE ' + conditions.join(' AND ');
   }
 
-  sql += ' ORDER BY sales.date DESC, sales.time DESC LIMIT 10';
+  sql += ' ORDER BY sales.date DESC LIMIT 10';
 
   try {
     const [rows] = await db.query(sql, values);

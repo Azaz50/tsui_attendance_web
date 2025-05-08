@@ -15,7 +15,7 @@ exports.visitCreate = async (req, res) => {
       user_id,
       created_at: new Date(),
       updated_at: new Date(),
-      visit_date_time: null
+      visit_date_time
     };
 
     const result = await Visit.createVisit(visit);
