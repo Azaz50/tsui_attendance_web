@@ -35,16 +35,16 @@ exports.createShop = async (req, res) => {
 };
 
 exports.getAllShopsByRole = async (req, res) => {
-
   const user_id = req.user?.user_id;
   const employee_type = req.user?.employee_type;
+  const search = req.query.search || '';
 
   if (!user_id || !employee_type) {
     return res.status(401).json({ message: 'Unauthorized. User info missing.' });
   }
 
   try {
-    const shops = await Shop.getShopsByRole(user_id, employee_type);
+    const shops = await Shop.getShopsByRole(user_id, employee_type, search);
     res.status(200).json({
       message: 'Shop list fetched successfully',
       data: shops
@@ -57,5 +57,4 @@ exports.getAllShopsByRole = async (req, res) => {
     });
   }
 };
-
 

@@ -14,26 +14,35 @@ const createShop = async (shop) => {
   }
 };
 
-
-const getShopsByRole = async (user_id, employee_type) => {
+const getShopsByRole = async (user_id, employee_type, search = '') => {
   let sql = `SELECT * FROM shops`;
-  let values = [];
+  const values = [];
 
   const type = Number(employee_type);
+  let conditions = [];
 
   if (type === 2 || type === 3) {
-    sql += ` WHERE user_id = ?`;
+    conditions.push(`user_id = ?`);
     values.push(user_id);
+  }
+
+  if (search) {
+    conditions.push(`shop_name LIKE ?`);
+    values.push(`%${search}%`);
+  }
+
+  if (conditions.length > 0) {
+    sql += ' WHERE ' + conditions.join(' AND ');
   }
 
   try {
     const [rows] = await db.query(sql, values);
     return rows;
   } catch (error) {
+    console.error('Query Error:', error);
     throw error;
   }
 };
-
 
 
 module.exports = {

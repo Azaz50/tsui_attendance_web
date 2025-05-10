@@ -43,15 +43,23 @@ const updatePassword = async (userId, newHashedPassword) => {
   }
 }
 
-const countUsers = async () => {
-  const [rows] = await db.query('SELECT COUNT(*) AS count FROM users');
-  return rows[0].count;
+const countUsers = async (search = '') => {
+  const [rows] = await db.query(
+    `SELECT COUNT(*) as total FROM users
+     WHERE name LIKE ?`,
+    [`%${search}%`]
+  );
+  return rows[0].total;
 };
 
-const getUserList = async (limit, offset) => {
+
+const getUserList = async (limit, offset, search = '') => {
   const [rows] = await db.query(
-    'SELECT * FROM users ORDER BY user_id DESC LIMIT ? OFFSET ?',
-    [limit, offset]
+    `SELECT * FROM users
+     WHERE name LIKE ?
+     ORDER BY user_id DESC
+     LIMIT ? OFFSET ?`,
+    [`%${search}%`, limit, offset]
   );
   return rows;
 };

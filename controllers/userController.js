@@ -75,7 +75,7 @@ exports.loginUser = async (req, res) => {
     const token = jwt.sign({ 
       user_id: employee.user_id,
       employee_type: employee.employee_type
-     }, process.env.JWT_SECRET, { expiresIn: '1h' });
+     }, process.env.JWT_SECRET);
 
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 
@@ -110,18 +110,18 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-
 exports.getUserList = async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    const search = req.query.search || '';
 
-    // Fetch total user count
-    const totalUsers = await User.countUsers();
+    // Count users with search filter
+    const totalUsers = await User.countUsers(search);
 
-    // Fetch paginated users
-    const users = await User.getUserList(limit, offset);
+    // Fetch paginated users with search
+    const users = await User.getUserList(limit, offset, search);
 
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 
