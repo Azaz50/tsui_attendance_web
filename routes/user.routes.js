@@ -3,12 +3,12 @@ const router = express.Router();
 const { registerUser, loginUser, getUserList } = require('../controllers/userController');
 const { createShop, getAllShopsByRole } = require('../controllers/shopController');
 const { saleCreate, getSale, getSalesBarChartReport } = require('../controllers/saleController');
-const { createScheme } = require('../controllers/schemeController');
-const { visitCreate } = require('../controllers/visitController');
+const { createScheme, listSchemes } = require('../controllers/schemeController');
+const { visitCreate, getVisitList } = require('../controllers/visitController');
 const { createEmployeeType  } = require('../controllers/employeeTypeController');
 const { createHoliday, getHolidays, deleteHoliday  } = require('../controllers/holidayController');
 const { 
-    startAttendance, 
+    startAttendance,
     stopAttendance, 
     updateLocation 
 } = require('../controllers/attendanceLocationController');
@@ -29,7 +29,9 @@ router.post('/sales/add', saleCreate);
 router.get('/sales/list', getSale);
 router.get('/sales/bar-report', getSalesBarChartReport);
 router.post('/schemes/add', createScheme);
+router.get('/schemes/list', listSchemes);
 router.post('/visits/add', visitCreate);
+router.get('/visits/list', getVisitList);
 router.post('/start-attendance', startAttendance);
 router.post('/stop-attendance', stopAttendance);
 router.post('/update-location', updateLocation);

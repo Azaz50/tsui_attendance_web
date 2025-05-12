@@ -39,3 +39,28 @@ exports.createScheme = async (req, res) => {
     });
   }
 };
+
+
+exports.listSchemes = async (req, res) => {
+  try {
+    const schemes = await Shop.getAllSchemes();
+    const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
+    const updatedSchemes = schemes.map((scheme) => {
+      return {
+        ...scheme,
+        scheme_photo: scheme.scheme_banner_photo ? baseUrl + scheme.scheme_banner_photo : null
+      };
+    });
+
+    res.status(200).json({
+      message: 'Schemes fetched successfully',
+      data: updatedSchemes
+    });
+  } catch (error) {
+    console.error('Error fetching schemes:', error);
+    res.status(500).json({
+      message: 'Failed to fetch schemes',
+      error: error.message
+    });
+  }
+};

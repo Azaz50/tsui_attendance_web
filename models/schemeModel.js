@@ -24,6 +24,18 @@ const createScheme = async (scheme) => {
   }
 };
 
+const getAllSchemes = async () => {
+  const sql = `SELECT * FROM schemes ORDER BY created_at DESC`;
+
+  try {
+    const [rows] = await db.query(sql);
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
-    createScheme,
+  createScheme,
+  getAllSchemes
 };
