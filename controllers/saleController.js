@@ -102,7 +102,7 @@ exports.getSalesBarChartReport = async (req, res) => {
     // Create default 7-day list to fill in missing dates
     const dailyData = [];
     for (let i = 0; i < 7; i++) {
-      const day = moment().subtract(i, 'days').format('YYYY-MM-DD');
+      const day = moment().subtract(i, 'days').format('DD');
       const row = dailyRows.find(r => moment(r.sale_date).format('YYYY-MM-DD') === day);
       dailyData.push({
         day,
@@ -127,29 +127,29 @@ exports.getSalesBarChartReport = async (req, res) => {
     `, [user_id, startCurrentMonth, endCurrentMonth]);
 
     monthlyData.push({
-      month: currentDate.format('YYYY-MM'),
-      total_sales: currentMonthRows[0].total_sales ? parseFloat(currentMonthRows[0].total_sales) : 0,
+    month: currentDate.format('MMM'), // e.g., May
+    total_sales: currentMonthRows[0].total_sales ? parseFloat(currentMonthRows[0].total_sales) : 0,
+  });
+
+  for (let i = 1; i <= 6; i++) {
+    const monthMoment = currentDate.clone().subtract(i, 'months');
+    const start = monthMoment.clone().startOf('month').format('YYYY-MM-DD');
+    const end = monthMoment.clone().endOf('month').format('YYYY-MM-DD');
+
+    const [rows] = await db.query(`
+      SELECT SUM(total_amount) AS total_sales
+      FROM sales
+      WHERE user_id = ? AND DATE(date) BETWEEN ? AND ?
+    `, [user_id, start, end]);
+
+    monthlyData.push({
+      month: monthMoment.format('MMM'),
+      total_sales: rows[0].total_sales ? parseFloat(rows[0].total_sales) : 0,
     });
+  }
 
-    // Previous 6 full months
-    for (let i = 1; i <= 6; i++) {
-      const monthMoment = currentDate.clone().subtract(i, 'months');
-      const start = monthMoment.clone().startOf('month').format('YYYY-MM-DD');
-      const end = monthMoment.clone().endOf('month').format('YYYY-MM-DD');
 
-      const [rows] = await db.query(`
-        SELECT SUM(total_amount) AS total_sales
-        FROM sales
-        WHERE user_id = ? AND DATE(date) BETWEEN ? AND ?
-      `, [user_id, start, end]);
-
-      monthlyData.push({
-        month: monthMoment.format('YYYY-MM'),
-        total_sales: rows[0].total_sales ? parseFloat(rows[0].total_sales) : 0,
-      });
-    }
-
-    monthlyData.reverse(); // So earliest month comes first
+    monthlyData.reverse();
 
     res.status(200).json({
       message: 'Sales report generated successfully',
