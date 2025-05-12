@@ -125,7 +125,7 @@ exports.getUserList = async (req, res) => {
 
     const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
 
-    const updatedUsers = users.map(user => {
+    const updatedUsers = await Promise.all(users.map(async (user) => {
       let decryptedPassword = null;
 
       try {
@@ -134,12 +134,21 @@ exports.getUserList = async (req, res) => {
         console.error(`Failed to decrypt password for user ID ${user.user_id}:`, err.message);
       }
 
+      // Fetch employee type by user.employee_type
+      let employeeType = null;
+      try {
+        employeeType = await Employee.getEmployeeTypeById(user.employee_type);
+      } catch (err) {
+        console.error(`Failed to get employee type for user ID ${user.user_id}:`, err.message);
+      }
+
       return {
         ...user,
         password: decryptedPassword,
+        employee_type: employeeType,
         userPhoto: user.userPhoto ? baseUrl + user.userPhoto : null
       };
-    });
+    }));
 
     res.status(200).json({
       message: 'User list fetched successfully',

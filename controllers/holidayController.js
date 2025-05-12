@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const Holiday = require('../models/holidayModel');
+const Employee = require('../models/employeeTypeModel');
 
 exports.createHoliday = async (req, res) => {
   try {
@@ -32,23 +33,32 @@ exports.createHoliday = async (req, res) => {
 };
 
 exports.getHolidays = async (req, res) => {
-    try {
-      const holidays = await Holiday.fetchHolidays();
-  
-      const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
-  
-      const updatedHolidays = holidays.map(holiday => {
-        return {
-          ...holiday,
-          holiday_photo: holiday.holiday_photo ? baseUrl + holiday.holiday_photo : null
-        };
-      });
-  
-      res.json(updatedHolidays);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching holidays', error: error.message });
-    }
-  };
+  try {
+    const holidays = await Holiday.fetchHolidays();
+
+    const baseUrl = `${req.protocol}://${req.get('host')}/api/uploads/`;
+
+    const updatedHolidays = await Promise.all(holidays.map(async (holiday) => {
+      let employeeType = null;
+      try {
+        employeeType = await Employee.getEmployeeTypeById(holiday.employee_type);
+      } catch (err) {
+        console.error(`Failed to get employee type for holiday ID ${holiday.holiday_id}:`, err.message);
+      }
+
+      return {
+        ...holiday,
+        employee_type: employeeType,
+        holiday_photo: holiday.holiday_photo ? baseUrl + holiday.holiday_photo : null
+      };
+    }));
+
+    res.json(updatedHolidays);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching holidays', error: error.message });
+  }
+};
+
   
 
 exports.deleteHoliday = async (req, res) => {

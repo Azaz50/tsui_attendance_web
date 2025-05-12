@@ -45,7 +45,7 @@ exports.saleCreate = async (req, res) => {
     await Visit.createVisit(visit);
 
     res.status(201).json({
-      message: 'Sale and Visit created successfully',
+      message: 'Product Sold successfully',
       saleId: saleResult.insertId,
     });
 

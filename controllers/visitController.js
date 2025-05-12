@@ -21,7 +21,7 @@ exports.visitCreate = async (req, res) => {
     const result = await Visit.createVisit(visit);
 
     res.status(201).json({
-      message: 'visit created successfully',
+      message: 'shop visited successfully',
       visitId: result.insertId,
     });
 
