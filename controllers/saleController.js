@@ -87,8 +87,12 @@ exports.getSalesBarChartReport = async (req, res) => {
 
   try {
     // === DAILY REPORT: past 7 days including today ===
-    const dailyEnd = moment().endOf('day').format('YYYY-MM-DD');
-    const dailyStart = moment().subtract(6, 'days').startOf('day').format('YYYY-MM-DD');
+    const moment = require('moment-timezone');
+    const TIMEZONE = 'Asia/Kolkata';
+
+    const dailyEnd = moment().tz(TIMEZONE).endOf('day').format('YYYY-MM-DD');
+    const dailyStart = moment().tz(TIMEZONE).subtract(6, 'days').startOf('day').format('YYYY-MM-DD');
+
 
     const dailyQuery = `
       SELECT DATE(date) AS sale_date, SUM(total_amount) AS total_sales
@@ -101,16 +105,20 @@ exports.getSalesBarChartReport = async (req, res) => {
 
     // Create default 7-day list to fill in missing dates
     const dailyData = [];
+
     for (let i = 0; i < 7; i++) {
-      const day = moment().subtract(i, 'days').format('DD');
-      const row = dailyRows.find(r => moment(r.sale_date).format('YYYY-MM-DD') === day);
+      const fullDate = moment().subtract(i, 'days').format('YYYY-MM-DD');
+      const displayDay = moment(fullDate).format('DD');
+
+      const row = dailyRows.find(r => moment(r.sale_date).format('YYYY-MM-DD') === fullDate);
+
       dailyData.push({
-        day,
+        day: displayDay,
         total_sales: row ? parseFloat(row.total_sales) : 0,
       });
     }
-
-    dailyData.reverse(); // So it's from oldest to newest
+    
+    dailyData.reverse();
 
     // === MONTHLY REPORT: current month (up to today) + 6 previous full months ===
     const currentDate = moment();

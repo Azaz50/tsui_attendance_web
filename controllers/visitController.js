@@ -36,20 +36,19 @@ exports.visitCreate = async (req, res) => {
 
 exports.getVisitList = async (req, res) => {
   const user_id = req.query.user_id;
-  const shop_name = req.query.shop_name || null;
+  const shop_id = req.query.shop_id || null;
 
   if (!user_id) {
     return res.status(400).json({ message: "user_id is required" });
   }
 
   try {
-    const visits = await Visit.getVisitList(user_id, shop_name);
+    const visits = await Visit.getVisitList(user_id, shop_id);
 
     res.status(200).json({
       message: "Visit list fetched successfully",
       data: visits
     });
-
   } catch (error) {
     console.error('Error fetching visit list:', error);
     res.status(500).json({
@@ -58,4 +57,3 @@ exports.getVisitList = async (req, res) => {
     });
   }
 };
-

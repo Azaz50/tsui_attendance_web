@@ -14,27 +14,30 @@ const createVisit = async (visit) => {
   }
 };
 
-const getVisitList = async (user_id, shop_name = null) => {
+const getVisitList = async (user_id, shop_id = null) => {
   let sql = `
-    SELECT 
+    SELECT DISTINCT
+      s.shop_id,
       s.shop_name,
       s.shop_address,
-      s.shop_owner_name,
-      v.visit_date_time
-    FROM visits v
-    JOIN shops s ON v.user_id = s.user_id
-    WHERE v.user_id = ?
+      s.shop_owner_name
+    FROM shops s
+    WHERE s.user_id = ?
   `;
+
   const values = [user_id];
 
-  if (shop_name) {
-    sql += ` AND s.shop_name LIKE ?`;
-    values.push(`%${shop_name}%`);
+  // If shop_id is passed, filter that specific shop
+  if (shop_id) {
+    sql += ` AND s.shop_id = ?`;
+    values.push(shop_id);
   } else {
-    sql += ` AND DATE(v.visit_date_time) = CURDATE()`;
+    // Only include if that user_id exists in visits table
+    sql += ` AND EXISTS (
+      SELECT 1 FROM visits v
+      WHERE v.user_id = s.user_id
+    )`;
   }
-
-  sql += ` ORDER BY v.visit_date_time DESC`;
 
   try {
     const [rows] = await db.query(sql, values);
@@ -44,6 +47,7 @@ const getVisitList = async (user_id, shop_name = null) => {
     throw error;
   }
 };
+
 
 module.exports = {
   createVisit,
