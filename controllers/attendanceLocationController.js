@@ -9,6 +9,10 @@ const startAttendance = async (req, res) => {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
+   if (!Array.isArray(cordinate) || cordinate.length === 0) {
+    return res.status(400).json({ message: 'Your location is required' });
+  }
+
   try {
     const result = {
       user_id,
@@ -33,7 +37,7 @@ const startAttendance = async (req, res) => {
       updated_at: new Date()
     });
 
-    res.status(201).json({ message: 'Attendance started and location saved', attend_id });
+    res.status(201).json({ message: 'Your attendance is started and location update is running.', attend_id });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
