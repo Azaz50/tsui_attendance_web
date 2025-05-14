@@ -26,9 +26,50 @@ const getAttendanceById = async (attend_id) => {
   return rows;
 };
 
+const fetchAttendanceWithLocation = async (user_id, attend_date) => {
+  const query = `
+    SELECT 
+      a.attend_id,
+      a.user_id,
+      a.attend_date,
+      a.attend_start_time,
+      a.attend_end_time,
+      a.attend_status,
+      l.loc_id,
+      l.cordinate,
+      l.recorded_at
+    FROM attendances a
+    LEFT JOIN locations l ON a.attend_id = l.attend_id
+    WHERE a.user_id = ? AND a.attend_date = ?
+    ORDER BY l.recorded_at ASC
+  `;
+
+  const [rows] = await db.query(query, [user_id, attend_date]);
+  return rows;
+};
+
+const fetchAttendanceByMonth = async ({ user_id, month }) => {
+  const query = `
+    SELECT 
+      a.attend_id,
+      a.user_id,
+      a.attend_date
+    FROM attendances a
+    LEFT JOIN locations l ON a.attend_id = l.attend_id
+    WHERE a.user_id = ?
+      AND MONTH(a.attend_date) = ?
+    ORDER BY a.attend_date DESC
+  `;
+
+  const [rows] = await db.query(query, [user_id, month]);
+  return rows;
+};
+
+
 module.exports = {
   createAttendance,
   updateEndTime,
-  getAttendanceById
-  
+  getAttendanceById,
+  fetchAttendanceWithLocation,
+  fetchAttendanceByMonth
 };

@@ -10,7 +10,9 @@ const { createHoliday, getHolidays, deleteHoliday  } = require('../controllers/h
 const { 
     startAttendance,
     stopAttendance, 
-    updateLocation 
+    updateLocation,
+    getAttendanceWithLocation,
+    fetchMonthlyAttendance
 } = require('../controllers/attendanceLocationController');
 
 const { createSalary, updateSalary, listSalaries  } = require('../controllers/salaryController');
@@ -35,6 +37,8 @@ router.get('/visits/list', getVisitList);
 router.post('/start-attendance', startAttendance);
 router.post('/stop-attendance', stopAttendance);
 router.post('/update-location', updateLocation);
+router.get('/attendances', getAttendanceWithLocation);
+router.get('/attendances/monthly', fetchMonthlyAttendance);
 router.post('/employees/create', createEmployeeType); 
 router.post('/holidays/add', createHoliday);
 router.get('/holidays/list', getHolidays);

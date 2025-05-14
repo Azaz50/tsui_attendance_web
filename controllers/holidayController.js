@@ -2,6 +2,7 @@ const path = require('path');
 const fs = require('fs');
 const Holiday = require('../models/holidayModel');
 const Employee = require('../models/employeeTypeModel');
+const db = require('../config/db.config');
 
 exports.createHoliday = async (req, res) => {
   try {
@@ -12,23 +13,37 @@ exports.createHoliday = async (req, res) => {
       return res.status(400).json({ message: 'Employee type and holiday photo are required' });
     }
 
+    // Step 1: Get employee_type_id from employee_type table
+    const [typeRows] = await db.query(
+      'SELECT id FROM employee_types WHERE employee_type = ?',
+      [employee_type]
+    );
+
+    if (typeRows.length === 0) {
+      return res.status(404).json({ message: 'Invalid employee type' });
+    }
+
+    const employee_type_id = typeRows[0].id;
+
+    // Step 2: Save photo
     const fileName = `holiday_${Date.now()}${path.extname(uploadedPhoto.name)}`;
     const uploadPath = path.join(__dirname, '../uploads', fileName);
-
     await uploadedPhoto.mv(uploadPath);
 
     const holiday = {
-      employee_type,
+      employee_type: employee_type_id,
       holiday_photo: fileName
     };
 
-    const result = await Holiday.createHoliday(holiday);
+    // Step 3: Create or Update holiday
+    const { isUpdated, result } = await Holiday.createOrUpdateHoliday(holiday);
 
-    res.status(201).json({ message: 'Holiday created', holidayId: result.insertId });
+    const message = isUpdated ? 'Holiday photo updated' : 'Holiday created';
+    res.status(201).json({ message, holidayId: result.insertId });
 
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Error creating holiday', error: error.message });
+    res.status(500).json({ message: 'Error creating/updating holiday', error: error.message });
   }
 };
 

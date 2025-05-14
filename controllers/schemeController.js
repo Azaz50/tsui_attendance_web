@@ -28,7 +28,7 @@ exports.createScheme = async (req, res) => {
 
     res.status(201).json({
       message: 'Scheme created successfully',
-      shopId: result.insertId
+      schemeId: result.insertId
     });
 
   } catch (error) {

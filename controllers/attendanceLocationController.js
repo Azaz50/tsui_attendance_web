@@ -1,5 +1,6 @@
 const Attendance = require('../models/attendanceModel');
 const Location = require('../models/locationModel');
+const moment = require('moment');
 
 const startAttendance = async (req, res) => {
   const { user_id, attend_date, attend_start_time, attend_status = 1, cordinate, recorded_at, created_at, updated_at } = req.body;
@@ -81,9 +82,61 @@ const updateLocation = async (req, res) => {
   }
 };
 
+const getAttendanceWithLocation = async (req, res) => {
+  const { user_id, attend_date } = req.query;
+
+  if (!user_id || !attend_date) {
+    return res.status(400).json({ success: false, message: "user_id and attend_date are required" });
+  }
+
+  try {
+    const data = await Attendance.fetchAttendanceWithLocation(user_id, attend_date);
+
+    const formattedData = data.map(item => ({
+      ...item,
+      attend_date: moment(item.attend_date).format("YYYY-MM-DD")
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: formattedData
+    });
+  } catch (error) {
+    console.error("Error fetching attendance with location:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
+const fetchMonthlyAttendance = async (req, res) => {
+  const { user_id, month } = req.query;
+
+  if (!user_id || !month) {
+    return res.status(400).json({ success: false, message: "user_id and month are required" });
+  }
+
+  try {
+    const data = await Attendance.fetchAttendanceByMonth({ user_id, month });
+     const formattedData = data.map(item => ({
+      ...item,
+      attend_date: moment(item.attend_date).format("YYYY-MM-DD")
+    }));
+    
+    res.status(200).json({
+      success: true,
+      total: data.length,
+      data: formattedData
+    });
+  } catch (error) {
+    console.error("Monthly attendance fetch error:", error);
+    res.status(500).json({ success: false, message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   startAttendance,
   stopAttendance,
-  updateLocation
+  updateLocation,
+  getAttendanceWithLocation,
+  fetchMonthlyAttendance
 };
 
