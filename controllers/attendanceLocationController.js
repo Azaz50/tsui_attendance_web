@@ -45,8 +45,12 @@ const startAttendance = async (req, res) => {
 
 const stopAttendance = async (req, res) => {
   const { attend_id, user_id, attend_end_time, cordinate, recorded_at, created_at, updated_at } = req.body;
-  if (!attend_id || !Array.isArray(cordinate)) {
-    return res.status(400).json({ message: 'Missing required fields' });
+  if (!attend_id) {
+    return res.status(400).json({ message: 'attend id is required' });
+  }
+
+   if (!Array.isArray(cordinate) || cordinate.length === 0) {
+    return res.status(400).json({ message: 'Your location is required' });
   }
 
   try {
@@ -68,8 +72,8 @@ const stopAttendance = async (req, res) => {
 const updateLocation = async (req, res) => {
   const { attend_id, user_id, cordinate, created_at, updated_at } = req.body;
 
-  if (!attend_id || !cordinate || !Array.isArray(cordinate)) {
-    return res.status(400).json({ message: 'Missing or invalid required fields' });
+   if (!attend_id || !Array.isArray(cordinate) || cordinate.length === 0) {
+    return res.status(400).json({ message: 'Your location is required' });
   }
 
   try {
