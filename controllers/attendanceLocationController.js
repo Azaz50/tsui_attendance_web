@@ -63,7 +63,7 @@ const stopAttendance = async (req, res) => {
       recorded_at
     });
 
-    res.status(200).json({ message: 'Attendance stopped and location updated' });
+    res.status(200).json({ message: 'Your attendance is submited successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }

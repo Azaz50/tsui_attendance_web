@@ -63,11 +63,16 @@ exports.getSale = async (req, res) => {
   const { start_date, end_date, user_id, shop_id } = req.query;
 
   try {
-    const sales = await Sale.getSales({ start_date, end_date, user_id, shop_id });
+    const data = await Sale.getSales({ start_date, end_date, user_id, shop_id });
+
+     const formattedData = data.map(item => ({
+          ...item,
+          date: moment(item.date).format("YYYY-MM-DD")
+      }));
 
     res.status(200).json({
       message: 'Sales fetched successfully',
-      data: sales,
+      data: formattedData,
     });
   } catch (error) {
     console.error('Error fetching sales:', error);
