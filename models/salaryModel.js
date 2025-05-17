@@ -117,8 +117,47 @@ const listSalaries = async () => {
 };
 
 
+const createSalarySlip = async (slip) => {
+  const sql = `
+    INSERT INTO salary_slips 
+    (user_id, month, excel_file, created_at, updated_at)
+    VALUES (?, ?, ?, NOW(), NOW())
+  `;
+
+  const values = [
+    slip.user_id,
+    slip.month,
+    slip.excel_file
+  ];
+
+  const [result] = await db.query(sql, values);
+  return result;
+};
+
+
+const getSalarySlipsByUserAndMonth = async (user_id, month) => {
+  const sql = 'SELECT * FROM salary_slips WHERE user_id = ? AND month = ?';
+  const [rows] = await db.query(sql, [user_id, month]);
+  return rows;
+};
+
+const getSalaryMonthsByUser = async (user_id) => {
+  const sql = `
+    SELECT DISTINCT month 
+    FROM salary_slips 
+    WHERE user_id = ?
+    ORDER BY month ASC
+  `;
+  const [rows] = await db.query(sql, [user_id]);
+  return rows;
+};
+
+
 module.exports = {
   createSalary,
   updateSalary,
-  listSalaries
+  listSalaries,
+  createSalarySlip,
+  getSalarySlipsByUserAndMonth,
+  getSalaryMonthsByUser
 };
