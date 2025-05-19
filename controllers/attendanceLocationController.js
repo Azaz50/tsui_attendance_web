@@ -60,7 +60,7 @@ const stopAttendance = async (req, res) => {
       cordinate
     });
 
-    res.status(200).json({ message: 'Your attendance is submited successfully' });
+    res.status(200).json({ message: 'Your attendance is submited successfully',  attend_id: attend_id });
   } catch (err) {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
