@@ -1,11 +1,11 @@
 const db = require('../config/db.config');
 
-const saveLocation = async ({ attend_id, user_id, cordinate, recorded_at, created_at, updated_at }) => {
+const saveLocation = async ({ attend_id, user_id, cordinate, created_at, updated_at }) => {
   const initialArray = JSON.stringify([cordinate]);
   await db.query(`
-    INSERT INTO locations (attend_id, user_id, cordinate, recorded_at, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?)`,
-    [attend_id, user_id, initialArray, recorded_at, created_at, updated_at]
+    INSERT INTO locations (attend_id, user_id, cordinate, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?)`,
+    [attend_id, user_id, initialArray, created_at, updated_at]
   );
 };
 

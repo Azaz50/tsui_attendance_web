@@ -36,12 +36,11 @@ const fetchAttendanceWithLocation = async (user_id, attend_date) => {
       a.attend_end_time,
       a.attend_status,
       l.loc_id,
-      l.cordinate,
-      l.recorded_at
+      l.cordinate
     FROM attendances a
     LEFT JOIN locations l ON a.attend_id = l.attend_id
     WHERE a.user_id = ? AND a.attend_date = ?
-    ORDER BY l.recorded_at ASC
+    ORDER BY a.attend_date ASC
   `;
 
   const [rows] = await db.query(query, [user_id, attend_date]);
