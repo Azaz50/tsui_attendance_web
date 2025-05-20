@@ -17,6 +17,14 @@ app.use('/api',router);
 
 const PORT = process.env.PORT;
 
+app.get('/api/privacy-policy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy-policy.html'));
+});
+
+app.get('/api/terms-condition', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms-condition.html'));
+});
+
 
 // Start server
 app.listen(PORT, () => {
