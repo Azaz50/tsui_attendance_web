@@ -38,16 +38,27 @@ exports.getAllShopsByRole = async (req, res) => {
   const user_id = req.user?.user_id;
   const employee_type = req.user?.employee_type;
   const search = req.query.search || '';
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const offset = (page - 1) * limit;
 
   if (!user_id || !employee_type) {
     return res.status(401).json({ message: 'Unauthorized. User info missing.' });
   }
 
   try {
-    const shops = await Shop.getShopsByRole(user_id, employee_type, search);
+    const shops = await Shop.getShopsByRole(user_id, employee_type, search, limit, offset);
+    const total = await Shop.countShopsByRole(user_id, employee_type, search); // We'll add this below
+
     res.status(200).json({
       message: 'Shop list fetched successfully',
-      data: shops
+      data: shops,
+      pagination: {
+        total,
+        currentPage: page,
+        totalPages: Math.ceil(total / limit),
+        pageSize: limit
+      }
     });
   } catch (error) {
     console.error('Error fetching shop list:', error);

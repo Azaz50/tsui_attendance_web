@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken');
 exports.registerUser = async (req, res) => {
   const { 
     name, email, password, phone_number, address, status, emp_id, designation,
-    department, uan, pf_number, esi_number, bank, acc_number, ifsc
+    department, uan, pf_number, esi_number, bank, acc_number, ifsc, branch
   } = req.body;
 
   let { created_at, updated_at, date_of_joining, employee_type } = req.body;
@@ -42,7 +42,7 @@ exports.registerUser = async (req, res) => {
     const user = { 
       name, email, password: encryptedPassword, address, phone_number, userPhotoName, status, 
       employee_type: employee_type_id, created_at, updated_at,
-      emp_id, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc
+      emp_id, designation, department, date_of_joining, uan, pf_number, esi_number, bank, acc_number, ifsc, branch
     };
 
     const result = await User.createUser(user);
@@ -100,7 +100,8 @@ exports.loginUser = async (req, res) => {
         esi_number: employee.esi_number,
         bank: employee.bank,
         acc_number: employee.acc_number,
-        ifsc: employee.ifsc
+        ifsc: employee.ifsc,
+        branch: employee.branch
       }
     });
 

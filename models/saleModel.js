@@ -3,8 +3,8 @@ const db = require('../config/db.config');
 const createSale = async (sale) => {
   const sql = `
     INSERT INTO sales 
-      (shop_id, user_id, date, time, number_purches_item, selling_rate, total_amount, locker_type, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (shop_id, user_id, date, time, number_purches_item, selling_rate, description, total_amount, locker_type, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
@@ -14,6 +14,7 @@ const createSale = async (sale) => {
     sale.time,
     sale.number_purches_item,
     sale.selling_rate,
+    sale.description,
     sale.total_amount,
     sale.locker_type,
     sale.created_at,
