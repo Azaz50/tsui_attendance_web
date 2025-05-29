@@ -147,8 +147,12 @@ exports.getUserList = async (req, res) => {
         ...user,
         password: decryptedPassword,
         employee_type: employeeType,
-        userPhoto: user.userPhoto ? baseUrl + user.userPhoto : null
+        userPhoto: user.userPhoto ? baseUrl + user.userPhoto : null,
+        date_of_joining: user.date_of_joining
+          ? new Date(user.date_of_joining).toISOString().split('T')[0]
+          : null
       };
+
     }));
 
     res.status(200).json({
