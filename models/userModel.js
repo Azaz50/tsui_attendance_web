@@ -56,7 +56,7 @@ const countUsers = async (search = '') => {
 const getUserList = async (limit, offset, search = '') => {
   const [rows] = await db.query(
     `SELECT * FROM users
-     WHERE name LIKE ?
+     WHERE name LIKE ? and NOT employee_type = '1'
      ORDER BY user_id DESC
      LIMIT ? OFFSET ?`,
     [`%${search}%`, limit, offset]
