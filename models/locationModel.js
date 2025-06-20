@@ -31,12 +31,11 @@ const updateLocation = async ({ attend_id, cordinate }) => {
   await db.query(
     `
     UPDATE locations 
-    SET cordinate = ?
+    SET cordinate = ?, updated_at = NOW()
     WHERE attend_id = ?`,
     [JSON.stringify(previousCordinates), attend_id]
   );
 };
-
 
 module.exports = {
   saveLocation,

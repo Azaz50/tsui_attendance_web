@@ -66,10 +66,11 @@ const stopAttendance = async (req, res) => {
   }
 };
 
-const updateLocation = async (req, res) => {
-  const { attend_id, user_id, cordinate, created_at, updated_at } = req.body;
 
-   if (!attend_id || !Array.isArray(cordinate) || cordinate.length === 0) {
+const updateLocation = async (req, res) => {
+  const { attend_id, user_id, cordinate } = req.body;
+
+  if (!attend_id || !Array.isArray(cordinate) || cordinate.length === 0) {
     return res.status(400).json({ message: 'Your location is required' });
   }
 
@@ -77,8 +78,6 @@ const updateLocation = async (req, res) => {
     await Location.updateLocation({
       attend_id,
       cordinate,
-      created_at: new Date(),
-      updated_at: new Date()
     });
 
     res.status(200).json({ message: 'Location updated successfully' });
@@ -86,6 +85,7 @@ const updateLocation = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
+
 
 const getAttendanceWithLocation = async (req, res) => {
   const { user_id, attend_date } = req.query;

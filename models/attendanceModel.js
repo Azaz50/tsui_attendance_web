@@ -12,11 +12,12 @@ const createAttendance = async ({ user_id, attend_date, attend_start_time, atten
 const updateEndTime = async ({ attend_id, attend_end_time }) => {
   await db.query(`
     UPDATE attendances 
-    SET attend_end_time = ?, attend_status = 0 
+    SET attend_end_time = ?, attend_status = 0 , updated_at = NOW()
     WHERE attend_id = ?`,
     [attend_end_time, attend_id]
   );
 };
+
 
 const getAttendanceById = async (attend_id) => {
   const [rows] = await db.query(
