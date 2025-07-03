@@ -1,19 +1,36 @@
 const db = require('../config/db.config');
 
 const createAttendance = async ({ user_id, attend_date, attend_start_time, attend_status, created_at, updated_at }) => {
-  const [result] = await db.query(`
-    INSERT INTO attendances (user_id, attend_date, attend_start_time, attend_status, created_at, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?)`,
+  const [result] = await db.query(
+    `
+    INSERT INTO attendances 
+      (user_id, attend_date, attend_start_time, attend_status, created_at, updated_at)
+    VALUES 
+      (?, ?, ?, 1, NOW(), NOW())
+    `,
     [user_id, attend_date, attend_start_time, attend_status, created_at, updated_at]
   );
-  return result;
+  return result.insertId;
+};
+
+const getLatestAttendance = async (user_id, attend_date) => {
+  const [rows] = await db.query(
+    `
+    SELECT attend_id, attend_status 
+    FROM attendances 
+    WHERE user_id = ? AND attend_date = ? 
+    ORDER BY attend_id DESC LIMIT 1
+    `,
+    [user_id, attend_date]
+  );
+  return rows.length > 0 ? rows[0] : null;
 };
 
 const updateEndTime = async ({ attend_id, attend_end_time }) => {
-  await db.query(`
-    UPDATE attendances 
-    SET attend_end_time = ?, attend_status = 0 , updated_at = NOW()
-    WHERE attend_id = ?`,
+  await db.query(
+    `UPDATE attendances
+     SET attend_end_time = ?, attend_status = 0, updated_at = NOW() 
+     WHERE attend_id = ?`,
     [attend_end_time, attend_id]
   );
 };
@@ -71,5 +88,6 @@ module.exports = {
   updateEndTime,
   getAttendanceById,
   fetchAttendanceWithLocation,
-  fetchAttendanceByMonth
+  fetchAttendanceByMonth,
+  getLatestAttendance
 };
