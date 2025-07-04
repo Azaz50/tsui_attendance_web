@@ -3,7 +3,7 @@ const Location = require('../models/locationModel');
 const moment = require('moment');
 
 const startAttendance = async (req, res) => {
-  const { user_id, attend_date, attend_start_time, cordinate, time } = req.body;
+  const { user_id, attend_date, attend_start_time, cordinate } = req.body;
 
   // Validate required fields
   if (
@@ -11,8 +11,7 @@ const startAttendance = async (req, res) => {
     !attend_date ||
     !attend_start_time ||
     !Array.isArray(cordinate) ||
-    cordinate.length === 0 ||
-    !time
+    cordinate.length === 0
   ) {
     return res.status(400).json({ message: "Missing required fields, location, or time" });
   }
@@ -24,7 +23,7 @@ const startAttendance = async (req, res) => {
     if (existingAttendance) {
       if (existingAttendance.attend_status === 1) {
         // Append the new cordinate + time
-        await Location.updateLocation(existingAttendance.attend_id, cordinate, time);
+        await Location.updateLocation(existingAttendance.attend_id, cordinate, attend_start_time);
 
         return res.status(200).json({
           message: "Your attendance is already started. Location has been updated.",
@@ -50,7 +49,7 @@ const startAttendance = async (req, res) => {
       attend_id,
       user_id,
       cordinate,
-      time
+      attend_start_time
     });
 
     res.status(201).json({
@@ -65,13 +64,13 @@ const startAttendance = async (req, res) => {
 };
 
 const stopAttendance = async (req, res) => {
-  const { attend_id, user_id, attend_end_time, cordinate, time } = req.body;
+  const { attend_id, user_id, attend_end_time, cordinate } = req.body;
 
   if (!attend_id) {
     return res.status(400).json({ message: 'attend_id is required' });
   }
 
-  if (!Array.isArray(cordinate) || cordinate.length === 0 || !time) {
+  if (!Array.isArray(cordinate) || cordinate.length === 0 || !attend_end_time) {
     return res.status(400).json({ message: 'Your location and time are required' });
   }
 
@@ -81,7 +80,7 @@ const stopAttendance = async (req, res) => {
       attend_end_time
     });
 
-    await Location.updateLocation(attend_id, cordinate, time);
+    await Location.updateLocation(attend_id, cordinate, attend_end_time);
 
     res.status(200).json({ 
       message: 'Your attendance is submitted successfully',
@@ -119,24 +118,52 @@ const getAttendanceWithLocation = async (req, res) => {
   const { user_id, attend_date } = req.query;
 
   if (!user_id || !attend_date) {
-    return res.status(400).json({ success: false, message: "user_id and attend_date are required" });
+    return res.status(400).json({
+      success: false,
+      message: "user_id and attend_date are required",
+    });
   }
 
   try {
     const data = await Attendance.fetchAttendanceWithLocation(user_id, attend_date);
 
-    const formattedData = data.map(item => ({
-      ...item,
-      attend_date: moment(item.attend_date).format("YYYY-MM-DD")
-    }));
+    const formattedData = data.map(item => {
+      let cordinateString = "";
+
+      if (item.cordinate) {
+        try {
+          const arr = JSON.parse(item.cordinate);
+
+          // Build the string manually with quotes in the time
+          cordinateString =
+            "[" +
+            arr
+              .map(coord => `[${coord[0]},${coord[1]}, "${coord[2]}"]`)
+              .join(",") +
+            "]";
+        } catch (err) {
+          cordinateString = "";
+        }
+      }
+
+      return {
+        ...item,
+        attend_date: moment(item.attend_date).format("YYYY-MM-DD"),
+        cordinate: cordinateString
+      };
+    });
 
     res.status(200).json({
       success: true,
-      data: formattedData
+      data: formattedData,
     });
   } catch (error) {
     console.error("Error fetching attendance with location:", error);
-    res.status(500).json({ success: false, message: "Server error", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 

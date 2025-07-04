@@ -1,9 +1,9 @@
 const db = require('../config/db.config');
 
-const saveLocation = async ({ attend_id, user_id, cordinate, time }) => {
-  // Always save as [lat, lng, time]
+const saveLocation = async ({ attend_id, user_id, cordinate, attend_start_time }) => {
+  // Always save as [lat, lng, attend_start_time]
   const initialArray = JSON.stringify([
-    [cordinate[0], cordinate[1], time]
+    [cordinate[0], cordinate[1], attend_start_time]
   ]);
 
   await db.query(
